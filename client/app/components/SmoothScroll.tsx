@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, ReactNode } from "react";
+import { useEffect, useRef, useState, ReactNode } from "react";
 
 interface SmoothScrollProps {
   children: ReactNode;
@@ -12,11 +12,15 @@ export default function SmoothScroll({ children }: SmoothScrollProps) {
   const currentY = useRef(0);
   const targetY = useRef(0);
   const ease = 0.075; // Lower = smoother but slower
+  const [isMobile, setIsMobile] = useState(true); // Default to mobile to prevent flash
 
   useEffect(() => {
     // Check if device supports smooth scroll (desktop only)
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    if (isMobile) return;
+    const checkMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || 
+                        window.innerWidth < 1024;
+    setIsMobile(checkMobile);
+    
+    if (checkMobile) return;
 
     const container = containerRef.current;
     const scroll = scrollRef.current;
@@ -55,6 +59,11 @@ export default function SmoothScroll({ children }: SmoothScrollProps) {
       document.body.style.height = "";
     };
   }, []);
+
+  // On mobile, render children directly without the fixed container
+  if (isMobile) {
+    return <>{children}</>;
+  }
 
   return (
     <div 

@@ -14,6 +14,19 @@ const ROOM_TTL_HOURS = parseInt(process.env.ROOM_TTL_HOURS || '24', 10);
 const ROOM_TTL_MS = ROOM_TTL_HOURS * 60 * 60 * 1000;
 const CLEANUP_INTERVAL_MS = 60 * 60 * 1000; // 1 hour
 
+// Keep-alive for Render free tier
+const SELF_PING_URL = process.env.SELF_PING_URL;
+const SELF_PING_INTERVAL = 10 * 60 * 1000; // 10 minutes
+
+if (SELF_PING_URL) {
+    console.log(`⏰ Keep-alive enabled for: ${SELF_PING_URL}`);
+    setInterval(() => {
+        fetch(SELF_PING_URL)
+            .then(res => console.log(`🏓 Self-ping status: ${res.status}`))
+            .catch(err => console.error(`❌ Self-ping failed: ${err.message}`));
+    }, SELF_PING_INTERVAL);
+}
+
 // Input validation helpers
 const isValidTime = (time) => typeof time === 'number' && !isNaN(time) && time >= 0;
 const sanitizeName = (name) => String(name || '').slice(0, 50).replace(/[<>]/g, '');

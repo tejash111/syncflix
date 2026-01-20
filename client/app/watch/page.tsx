@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { SocketProvider, useSocket } from "../context/SocketContext";
 import { onPlayRef, onPauseRef, onSeekRef, onSyncRequestRef, onSyncResponseRef } from "../context/SocketRefs";
 import VideoPlayer from "../components/VideoPlayer";
-import FileUpload from "../components/FileUpload";
+import { FileUpload } from "@/components/ui/file-upload";
 import RoomControls from "../components/RoomControls";
 
 function WatchContent() {
@@ -197,25 +197,31 @@ function WatchContent() {
               </h1>
             </motion.div>
 
-            {/* Video Player */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.1 }}
-            >
-              <VideoPlayer
-                videoUrl={videoUrl}
-                isPlaying={isPlaying}
-                currentTime={currentTime}
-                onPlay={handlePlay}
-                onPause={handlePause}
-                onSeek={handleSeek}
-                onTimeUpdate={handleTimeUpdate}
-                videoRef={videoRef}
-              />
-            </motion.div>
+            {/* Video Player - Only shown when video is loaded */}
+            <AnimatePresence>
+              {videoUrl && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.8, delay: 0.1 }}
+                  className="w-full max-w-[1400px] mx-auto"
+                >
+                  <VideoPlayer
+                    videoUrl={videoUrl}
+                    isPlaying={isPlaying}
+                    currentTime={currentTime}
+                    onPlay={handlePlay}
+                    onPause={handlePause}
+                    onSeek={handleSeek}
+                    onTimeUpdate={handleTimeUpdate}
+                    videoRef={videoRef}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-            {/* File Upload */}
+            {/* File Upload - Only shown when no video is loaded */}
             <AnimatePresence>
               {!videoUrl && (
                 <motion.div
@@ -223,49 +229,24 @@ function WatchContent() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.5 }}
+                  className="max-w-4xl mx-auto w-full"
                 >
                   <FileUpload
-                    onFileSelect={handleFileSelect}
-                    currentFile={videoFile}
+                    onChange={(files: File[]) => {
+                      if (files.length > 0) {
+                        const file = files[0];
+                        const url = URL.createObjectURL(file);
+                        handleFileSelect(file, url);
+                      }
+                    }}
                   />
+                  {/* Additional helper text if needed */}
+                  <p className="text-center text-sm text-[--text-secondary] mt-4">
+                    Supported formats: MP4, WebM, Ogg
+                  </p>
                 </motion.div>
               )}
             </AnimatePresence>
-
-            {/* Instructions */}
-            {!roomId && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.3 }}
-                className="border border-white/5 p-8"
-              >
-                <p className="text-label mb-6">HOW IT WORKS</p>
-                <ol className="space-y-4 text-sm text-[--text-secondary]">
-                  {[
-                    "Enter your name and create a room or join an existing one",
-                    "Share the room code or link with friends",
-                    "Everyone loads the same video file locally",
-                    "Play, pause, and seek are synchronized in real-time"
-                  ].map((step, index) => (
-                    <li key={index} className="flex items-start gap-4">
-                      <span className="text-label w-6">{String(index + 1).padStart(2, '0')}</span>
-                      <span>{step}</span>
-                    </li>
-                  ))}
-                </ol>
-              </motion.div>
-            )}
-
-            {/* File Info */}
-            {videoFile && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-              >
-                <FileUpload onFileSelect={handleFileSelect} currentFile={videoFile} />
-              </motion.div>
-            )}
           </div>
         </main>
 
@@ -277,7 +258,7 @@ function WatchContent() {
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: 100, opacity: 0 }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="w-80 lg:w-96 bg-[#050505] border-l border-white/5 p-8 overflow-y-auto fixed right-0 top-16 bottom-0 lg:relative lg:top-0"
+              className="w-full lg:w-96 bg-[#050505] border-l border-white/5 p-8 overflow-y-auto fixed right-0 top-16 bottom-0 lg:relative lg:top-0 z-40"
             >
               <div className="space-y-8">
                 <div>
