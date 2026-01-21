@@ -42,7 +42,7 @@ export default function ContactSection() {
     <section 
       ref={sectionRef}
       id="contact" 
-      className="relative py-32 px-8 md:px-16 bg-black border-t border-white/5"
+      className="relative  px-8 md:px-16 bg-black border-t border-white/5"
       onMouseMove={handleMouseMove}
     >
       {/* Subtle spotlight effect */}
@@ -57,7 +57,7 @@ export default function ContactSection() {
         {/* Main CTA */}
         <div className="text-center mb-24">
           <h2 
-            className={`section-title-outline transition-all duration-700 ${
+            className={`section-title-outline transition-all duration-700 cursor-default hover:text-white ${
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
             }`}
             style={{ letterSpacing: "0.1em" }}
@@ -142,6 +142,24 @@ export default function ContactSection() {
               TERMS
             </a>
           </div>
+        </div>
+
+        {/* Large Brand Text */}
+        <div className="mt-32  overflow-hidden">
+          <h3 
+            className={`font-bebas text-[20vw] md:text-[15vw] lg:text-[12vw] leading-none tracking-tight text-center transition-all duration-700 delay-700 ${
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
+            }`}
+            style={{
+              background: "linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.03) 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+              textShadow: "0 0 40px rgba(255,255,255,0.05)",
+            }}
+          >
+            SYNCFLIX
+          </h3>
         </div>
       </div>
     </section>
